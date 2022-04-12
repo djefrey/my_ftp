@@ -45,3 +45,12 @@ void client_clear_cmd(client_t *client)
     client->cmd.free = 0;
     client->cmd.ended = false;
 }
+
+bool client_check_logged(client_t *client)
+{
+    if (client->userid == -1) {
+        client_send(client, NOT_LOGGED, "Not logged.");
+        return false;
+    }
+    return true;
+}

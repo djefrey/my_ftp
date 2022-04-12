@@ -19,6 +19,7 @@
 #include "list.h"
 
 #define CRLF "\r\n"
+#define ANONYMOUS_USERID 0
 
 typedef unsigned int uint;
 typedef struct sockaddr sockaddr_t;
@@ -49,6 +50,7 @@ bool accept_new_clients(int socket, list_t *list);
 client_t *client_create(int fd, sockaddr_in_t *addr, list_t *list);
 void client_delete(client_t *client, list_t *list);
 void client_clear_cmd(client_t *client);
+bool client_check_logged(client_t *client);
 
 bool client_recv_cmd(client_t *client);
 bool client_send(client_t *client, int code, char *msg);

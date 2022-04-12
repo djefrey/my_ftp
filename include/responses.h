@@ -10,6 +10,7 @@
 #define SERV_RDY_IN_MIN 120
 #define DATA_CON_OPEN 125
 #define FILE_STATUS_OK 150
+
 #define COMMAND_OK 200
 #define HELP_MSG 214
 #define RDY_FOR_NEW_USER 220
@@ -19,5 +20,11 @@
 #define USER_LOGGED 230
 #define FILE_ACTION_OK 250
 #define PATH_CREATED 257
+
 #define USERNAME_OK 331
 #define NEED_LOGIN 332
+
+#define INVALID_LOGIN 430
+
+#define INVALID_ARG 501
+#define NOT_LOGGED 532

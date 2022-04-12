@@ -30,7 +30,7 @@ bool client_recv_cmd(client_t *client)
     FD_ZERO(&rdfds);
     FD_SET(client->fd, &rdfds);
     while (select(client->fd + 1, &rdfds,
-    NULL, NULL, &(timeval_t) {0, 100000}) > 0) {
+    NULL, NULL, &(timeval_t) {0, 10}) > 0) {
         read(client->fd, &c, 1);
         if (add_char_to_cmd(client, c))
             return true;

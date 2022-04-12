@@ -9,15 +9,18 @@
 
 void cwd_cmd(client_t *client, char *arg)
 {
-
+    if (!client_check_logged(client))
+        return;
 }
 
 void cdup_cmd(client_t *client, char *arg)
 {
-
+    if (!client_check_logged(client))
+        return;
 }
 
 void pwd_cmd(client_t *client, char *arg)
 {
-
+    if (!client_check_logged(client))
+        return;
 }
