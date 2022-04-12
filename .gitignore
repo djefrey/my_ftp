@@ -1,0 +1,5 @@
+**/*.o
+vgcore*
+.vscode
+myftp
+protocol.txt

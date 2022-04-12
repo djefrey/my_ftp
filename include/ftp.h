@@ -1,0 +1,43 @@
+/*
+** EPITECH PROJECT, 2022
+** B-NWP-400-STG-4-1-myftp-jeffrey.winkler
+** File description:
+** ftp
+*/
+
+#pragma once
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "responses.h"
+#include "list.h"
+
+#define CRLF "\r\n"
+
+typedef unsigned int uint;
+typedef struct sockaddr sockaddr_t;
+typedef struct sockaddr_in sockaddr_in_t;
+typedef struct timeval timeval_t;
+
+typedef struct client_s {
+    int fd;
+    int userid;
+    char *username;
+    struct sockaddr_in addr;
+} client_t;
+
+int dprintf(int fd, const char *restrict format, ...);
+
+int create_main_socket(short port);
+void accept_new_clients(int socket, list_t *list);
+
+client_t *client_create(int fd, sockaddr_in_t *addr, list_t *list);
+void client_delete(client_t *client, list_t *list);
+char *client_recv(client_t *client);
+bool client_send(client_t *client, int code, char *msg);
