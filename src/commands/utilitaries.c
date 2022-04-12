@@ -9,7 +9,6 @@
 
 void noop_cmd(client_t *client, char *arg)
 {
-
 }
 
 

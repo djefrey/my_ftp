@@ -20,5 +20,5 @@ void port_cmd(client_t *client, char *arg)
 
 void quit_cmd(client_t *client, char *arg)
 {
-
+    client->quit = true;
 }

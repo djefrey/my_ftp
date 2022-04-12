@@ -29,3 +29,4 @@ void list_cmd(client_t *client, char *arg);
 
 extern const char *CMD_NAME[NB_COMMANDS];
 extern const command_fct_t CMD_FCT[NB_COMMANDS];
+extern const int CMD_LEN[NB_COMMANDS];

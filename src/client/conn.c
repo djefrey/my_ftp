@@ -8,26 +8,23 @@
 #include <string.h>
 #include "ftp.h"
 
-static bool add_char_to_str(char c, char **str, int *size, int *free)
+static bool add_char_to_cmd(client_t *client, char c)
 {
-    if (*free == 0) {
-        *str = realloc(*str, *size + 32);
-        if (!(*str))
+    if (client->cmd.free == 0) {
+        client->cmd.str = realloc(client->cmd.str, client->cmd.size + 32);
+        if (!(client->cmd.str))
             return true;
-        *free = 32;
+        client->cmd.free = 32;
     }
-    (*str)[*size] = c;
-    *size += 1;
-    *free -= 1;
+    client->cmd.str[client->cmd.size] = c;
+    client->cmd.size += 1;
+    client->cmd.free -= 1;
     return false;
 }
 
-char *client_recv(client_t *client)
+bool client_recv_cmd(client_t *client)
 {
     fd_set rdfds;
-    char *str = NULL;
-    int size = 0;
-    int free = 0;
     char c;
 
     FD_ZERO(&rdfds);
@@ -35,14 +32,18 @@ char *client_recv(client_t *client)
     while (select(client->fd + 1, &rdfds,
     NULL, NULL, &(timeval_t) {0, 100000}) > 0) {
         read(client->fd, &c, 1);
-        if (add_char_to_str(c, &str, &size, &free))
-            return NULL;
-        if (size > 2 && str[size - 2] == '\r' && str[size - 1] == '\n')
+        if (add_char_to_cmd(client, c))
+            return true;
+        if (client->cmd.size > 2
+        && client->cmd.str[client->cmd.size - 2] == '\r'
+        && client->cmd.str[client->cmd.size - 1] == '\n') {
+            if (add_char_to_cmd(client, '\0'))
+                return true;
+            client->cmd.ended = true;
             break;
+        }
     }
-    if (str && add_char_to_str('\0', &str, &size, &free))
-        return NULL;
-    return str;
+    return false;
 }
 
 bool client_send(client_t *client, int code, char *msg)

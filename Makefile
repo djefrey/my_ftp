@@ -15,7 +15,8 @@ SRC				=	src/main.c						\
 					src/commands/conn.c				\
 					src/commands/files.c			\
 					src/commands/working_dir.c		\
-					src/commands/utilitaries.c
+					src/commands/utilitaries.c		\
+					src/commands/list.c
 
 OBJ				=	$(SRC:.c=.o)
 

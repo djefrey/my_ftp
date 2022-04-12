@@ -25,19 +25,32 @@ typedef struct sockaddr sockaddr_t;
 typedef struct sockaddr_in sockaddr_in_t;
 typedef struct timeval timeval_t;
 
+typedef struct cmd_s {
+    uint size;
+    uint free;
+    char *str;
+    bool ended;
+} cmd_t;
+
 typedef struct client_s {
     int fd;
     int userid;
     char *username;
+    bool quit;
     struct sockaddr_in addr;
+    cmd_t cmd;
 } client_t;
 
 int dprintf(int fd, const char *restrict format, ...);
 
 int create_main_socket(short port);
-void accept_new_clients(int socket, list_t *list);
+bool accept_new_clients(int socket, list_t *list);
 
 client_t *client_create(int fd, sockaddr_in_t *addr, list_t *list);
 void client_delete(client_t *client, list_t *list);
-char *client_recv(client_t *client);
+void client_clear_cmd(client_t *client);
+
+bool client_recv_cmd(client_t *client);
 bool client_send(client_t *client, int code, char *msg);
+
+bool execute_cmd(client_t *client);

@@ -17,13 +17,31 @@ client_t *client_create(int fd, sockaddr_in_t *addr, list_t *list)
     client->fd = fd;
     client->userid = -1;
     client->username = NULL;
+    client->quit = false;
+    client->cmd.size = 0;
+    client->cmd.free = 0;
+    client->cmd.str = NULL;
+    client->cmd.ended = false;
     memcpy(&client->addr, addr, sizeof(struct sockaddr_in));
     return client;
 }
 
 void client_delete(client_t *client, list_t *list)
 {
+    if (client->cmd.str)
+        free(client->cmd.str);
     close(client->fd);
     list_delete(list, client);
     free(client);
+}
+
+void client_clear_cmd(client_t *client)
+{
+    if (client->cmd.str) {
+        free(client->cmd.str);
+        client->cmd.str = NULL;
+    }
+    client->cmd.size = 0;
+    client->cmd.free = 0;
+    client->cmd.ended = false;
 }
