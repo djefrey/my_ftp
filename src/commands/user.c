@@ -19,7 +19,7 @@ void user_cmd(client_t *client, char *root_path,char *arg, size_t len)
 void pass_cmd(client_t *client, char *root_path,char *arg, size_t len)
 {
     if (client->username == NULL) {
-        client_send(client, BAD_SEQUENCE, "Bad sequence of commands.", 25);
+        client_send(client, NEED_LOGIN, "Need account for login.", 23);
     } else if (strlen(client->username) != 9
     || strcmp(client->username, "Anonymous") || len != 0) {
         client_send(client, INVALID_LOGIN, "Invalid name or password.", 25);
