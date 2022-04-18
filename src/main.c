@@ -59,7 +59,6 @@ int main(int ac, char **av)
     path = realpath(av[2], NULL);
     if (path == NULL || socket == -1)
         return 84;
-    printf("%s\n", path);
     while (run(socket, path, &list));
     free(path);
     close(socket);
