@@ -7,26 +7,26 @@
 
 #include "ftp.h"
 
-void retr_cmd(client_t *client, char *arg)
+void retr_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
     if (!client_check_logged(client))
         return;
 }
 
-void stor_cmd(client_t *client, char *arg)
+void stor_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
     if (!client_check_logged(client))
         return;
 
 }
 
-void list_cmd(client_t *client, char *arg)
+void list_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
     if (!client_check_logged(client))
         return;
 }
 
-void dele_cmd(client_t *client, char *arg)
+void dele_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
     if (!client_check_logged(client))
         return;

@@ -25,7 +25,7 @@ int create_main_socket(short port)
     return fd;
 }
 
-bool accept_new_clients(int socket, list_t *list)
+bool accept_new_clients(int socket, char *path, list_t *list)
 {
     socklen_t addr_size = sizeof(struct sockaddr);
     struct sockaddr_in addr_in;
@@ -39,10 +39,11 @@ bool accept_new_clients(int socket, list_t *list)
         fd = accept(socket, (sockaddr_t*) &addr_in, &addr_size);
         if (fd == -1)
             continue;
-        client = client_create(fd, &addr_in, list);
+        client = client_create(fd, &addr_in, path, list);
         if (!client)
             return true;
-        client_send(client, RDY_FOR_NEW_USER, "");
+        client_send(client, RDY_FOR_NEW_USER,
+        "Service ready for new user.", 27);
     }
     return false;
 }

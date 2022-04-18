@@ -7,25 +7,28 @@
 
 #pragma once
 
+#include <stddef.h>
+
 #define NB_COMMANDS 14
 
 typedef struct client_s client_t;
-typedef void (*command_fct_t)(client_t *client, char *arg);
+typedef void (*command_fct_t)(client_t *client,
+char *root_path, char *arg, size_t len);
 
-void user_cmd(client_t *client, char *arg);
-void pass_cmd(client_t *client, char *arg);
-void  cwd_cmd(client_t *client, char *arg);
-void cdup_cmd(client_t *client, char *arg);
-void quit_cmd(client_t *client, char *arg);
-void dele_cmd(client_t *client, char *arg);
-void  pwd_cmd(client_t *client, char *arg);
-void pasv_cmd(client_t *client, char *arg);
-void port_cmd(client_t *client, char *arg);
-void help_cmd(client_t *client, char *arg);
-void noop_cmd(client_t *client, char *arg);
-void retr_cmd(client_t *client, char *arg);
-void stor_cmd(client_t *client, char *arg);
-void list_cmd(client_t *client, char *arg);
+void user_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void pass_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void  cwd_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void cdup_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void quit_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void dele_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void  pwd_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void pasv_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void port_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void help_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void noop_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void retr_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void stor_cmd(client_t *client, char *root_path, char *arg, size_t len);
+void list_cmd(client_t *client, char *root_path, char *arg, size_t len);
 
 extern const char *CMD_NAME[NB_COMMANDS];
 extern const command_fct_t CMD_FCT[NB_COMMANDS];

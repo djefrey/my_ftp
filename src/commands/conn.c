@@ -5,20 +5,76 @@
 ** conn
 */
 
+#include <string.h>
 #include "ftp.h"
 
-void pasv_cmd(client_t *client, char *arg)
+static int open_data_socket(client_t *client)
 {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in_t addr_in;
 
+    if (fd == -1)
+        return -1;
+    addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr_in.sin_port = 0;
+    addr_in.sin_family = AF_INET;
+    if (bind(fd, (sockaddr_t*) &addr_in, sizeof(addr_in)))
+        return -1;
+    if (listen(fd, 1))
+        return -1;
+    return fd;
 }
 
-
-void port_cmd(client_t *client, char *arg)
+void pasv_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
+    int fd = open_data_socket(client);
+    sockaddr_in_t addr_in;
+    socklen_t socklen = sizeof(addr_in);
+    char buf[24];
 
+    client_close_data(client);
+    if (fd == -1) {
+
+        return;
+    }
+    if (getsockname(fd, (sockaddr_t*) &addr_in, &socklen) == -1) {
+
+        return;
+    }
+    if (listen(fd, 1) == -1) {
+
+        return;
+    };
+    client->conn.mode = PASV;
+    client->conn.listening_socket = fd;
+    sockaddr_to_ip(&addr_in, buf);
+    client_send(client, PASV_MODE, buf, strlen(buf));
 }
 
-void quit_cmd(client_t *client, char *arg)
+void port_cmd(client_t *client, char *root_path, char *arg, size_t len)
+{
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in_t addr_in;
+
+    client_close_data(client);
+    if (ip_to_sockaddr(arg, &addr_in)) {
+        client_send(client, INVALID_ARG, "Invalid argument.", 17);
+        return;
+    }
+    addr_in.sin_family = AF_INET;
+    printf("Connect ..\n");
+    if (connect(fd, (sockaddr_t*) &addr_in, sizeof(sockaddr_in_t)) == -1) {
+        client_send(client, INVALID_ARG, "Errr.", 5);
+
+        return;
+    }
+    printf("Connected !");
+    client->conn.mode = PORT;
+    client->conn.data = fd;
+    client_send(client, COMMAND_OK, "Command ok.", 11);
+}
+
+void quit_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
     client->quit = true;
 }

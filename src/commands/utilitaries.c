@@ -7,12 +7,12 @@
 
 #include "ftp.h"
 
-void noop_cmd(client_t *client, char *arg)
+void noop_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
 }
 
 
-void help_cmd(client_t *client, char *arg)
+void help_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
 
 }

@@ -8,16 +8,21 @@
 #include <string.h>
 #include "ftp.h"
 
-client_t *client_create(int fd, sockaddr_in_t *addr, list_t *list)
+client_t *client_create(int fd, sockaddr_in_t *addr, char *path, list_t *list)
 {
     client_t *client = malloc(sizeof(client_t));
+    char *cwd = strdup(path);
 
-    if (!client || list_add(list, client))
+    if (!client || !cwd || list_add(list, client))
         return NULL;
-    client->fd = fd;
+    client->conn.control = fd;
+    client->conn.data = -1;
+    client->conn.listening_socket = -1;
+    client->conn.mode = NONE;
     client->userid = -1;
     client->username = NULL;
     client->quit = false;
+    client->cwd = cwd;
     client->cmd.size = 0;
     client->cmd.free = 0;
     client->cmd.str = NULL;
@@ -30,9 +35,21 @@ void client_delete(client_t *client, list_t *list)
 {
     if (client->cmd.str)
         free(client->cmd.str);
-    close(client->fd);
+    client_close_data(client);
+    close(client->conn.control);
     list_delete(list, client);
     free(client);
+}
+
+void client_close_data(client_t *client)
+{
+    if (client->conn.data != -1)
+        close(client->conn.data);
+    if (client->conn.listening_socket != -1)
+        close(client->conn.listening_socket);
+    client->conn.data = -1;
+    client->conn.listening_socket = -1;
+    client->conn.mode = NONE;
 }
 
 void client_clear_cmd(client_t *client)
@@ -49,7 +66,7 @@ void client_clear_cmd(client_t *client)
 bool client_check_logged(client_t *client)
 {
     if (client->userid == -1) {
-        client_send(client, NOT_LOGGED, "Not logged.");
+        client_send(client, NOT_LOGGED, "Not logged.", 11);
         return false;
     }
     return true;

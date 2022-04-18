@@ -20,25 +20,29 @@ static command_fct_t get_cmd_fct(client_t *client)
     return NULL;
 }
 
-static void extract_arg(char *buf, char *str, size_t len)
+static size_t extract_arg(char *buf, char *str)
 {
+    int i = 0;
+
     for (; *str != ' ' && !(*str == '\r' && *(str + 1) == '\n'); str++);
     if (*str == '\r')
-        return;
+        return 0;
     str++;
-    for (int i = 0; !(*str == '\r' && *(str + 1) == '\n');
+    for (; !(*str == '\r' && *(str + 1) == '\n');
     buf[i] = *str, str++, i++);
+    return i;
 }
 
-bool execute_cmd(client_t *client)
+bool execute_cmd(client_t *client, char *root_path)
 {
     command_fct_t fct = get_cmd_fct(client);
     char buf[client->cmd.size];
+    size_t len;
 
     if (!fct)
         return false;
     memset(buf, 0, client->cmd.size - 1);
-    extract_arg(buf, client->cmd.str, client->cmd.size);
-    fct(client, buf);
+    len = extract_arg(buf, client->cmd.str);
+    fct(client, root_path, buf, len);
     return true;
 }
