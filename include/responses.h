@@ -24,6 +24,7 @@
 #define USERNAME_OK 331
 #define NEED_LOGIN 332
 
+#define DATA_NOT_OPEN 425
 #define INVALID_LOGIN 430
 #define LOCAL_ERROR 451
 
@@ -32,3 +33,4 @@
 #define BAD_SEQUENCE 503
 #define NOT_LOGGED 530
 #define INVALID_FILE 550
+#define ILLEGAL_FILE 553

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <fcntl.h>
 #include "ftp.h"
 
 static void disconnect_leaving_clients(list_t *list)

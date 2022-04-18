@@ -11,6 +11,7 @@ SRC				=	src/main.c						\
 					src/utils.c						\
 					src/client/client.c				\
 					src/client/conn.c				\
+					src/client/file.c				\
 					src/commands/commands.c			\
 					src/commands/user.c				\
 					src/commands/conn.c				\

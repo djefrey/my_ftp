@@ -5,6 +5,7 @@
 ** utils
 */
 
+#include <string.h>
 #include "ftp.h"
 
 bool is_arg_missing(client_t *client, size_t len)
@@ -22,6 +23,18 @@ bool check_alloc(client_t *client, void *ptr)
     if (ptr == NULL) {
         client_send(client, LOCAL_ERROR,
         "Requested action aborted. Local error in processing.", 52);
+        return true;
+    }
+    return false;
+}
+
+bool is_path_illegal(client_t *client, char *path, char *root_path)
+{
+    int len = strlen(root_path);
+
+    if (strncmp(path, root_path, len)) {
+        client_send(client, ILLEGAL_FILE,
+        "Requested action not taken. File name not allowed.", 50);
         return true;
     }
     return false;

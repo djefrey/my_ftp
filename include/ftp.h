@@ -71,12 +71,17 @@ bool client_recv_cmd(client_t *client);
 bool client_send(client_t *client, int code, char *msg, size_t len);
 void client_accept_pasv(client_t *client);
 
+void client_send_file(client_t *client, char *path);
+void client_send_folder_content(client_t *client, char *path);
+void client_send_file_info(client_t *client, char *path);
+
 bool execute_cmd(client_t *client, char *root_path);
 
 bool ip_to_sockaddr(char *str, sockaddr_in_t *sockaddr);
 void sockaddr_to_ip(sockaddr_in_t *sockaddr, char buf[24]);
-bool is_valid_path(char *path, char *root_path);
 char *make_path(char *cwd, char *path, size_t len);
 
 bool is_arg_missing(client_t *client, size_t len);
 bool check_alloc(client_t *client, void *ptr);
+bool is_path_illegal(client_t *client, char *path, char *root_path);
+
