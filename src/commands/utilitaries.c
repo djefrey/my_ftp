@@ -9,10 +9,11 @@
 
 void noop_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
+    client_send(client, COMMAND_OK, "Command ok.", 11);
 }
 
 
 void help_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
-
+    client_send(client, HELP_MSG, "HELP !", 6);
 }

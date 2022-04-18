@@ -77,3 +77,6 @@ bool ip_to_sockaddr(char *str, sockaddr_in_t *sockaddr);
 void sockaddr_to_ip(sockaddr_in_t *sockaddr, char buf[24]);
 bool is_valid_path(char *path, char *root_path);
 char *make_path(char *cwd, char *path, size_t len);
+
+bool is_arg_missing(client_t *client, size_t len);
+bool check_alloc(client_t *client, void *ptr);

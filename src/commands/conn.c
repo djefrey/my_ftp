@@ -44,7 +44,7 @@ void pasv_cmd(client_t *client, char *root_path, char *arg, size_t len)
     if (listen(fd, 1) == -1) {
 
         return;
-    };
+    }
     client->conn.mode = PASV;
     client->conn.listening_socket = fd;
     sockaddr_to_ip(&addr_in, buf);
@@ -53,19 +53,23 @@ void pasv_cmd(client_t *client, char *root_path, char *arg, size_t len)
 
 void port_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    int fd;
     sockaddr_in_t addr_in;
 
+    if (is_arg_missing(client, len))
+        return;
     client_close_data(client);
     if (ip_to_sockaddr(arg, &addr_in)) {
-        client_send(client, INVALID_ARG, "Invalid argument.", 17);
+        client_send(client, INVALID_ARG,
+        "Syntax error in parameters or arguments.", 40);
         return;
     }
+    fd = socket(AF_INET, SOCK_STREAM, 0);
     addr_in.sin_family = AF_INET;
     printf("Connect ..\n");
     if (connect(fd, (sockaddr_t*) &addr_in, sizeof(sockaddr_in_t)) == -1) {
         client_send(client, INVALID_ARG, "Errr.", 5);
-
+        close(fd);
         return;
     }
     printf("Connected !");
@@ -77,4 +81,6 @@ void port_cmd(client_t *client, char *root_path, char *arg, size_t len)
 void quit_cmd(client_t *client, char *root_path, char *arg, size_t len)
 {
     client->quit = true;
+    client_send(client, CLOSING_CONTROL_CON,
+    "Service closing control connection.", 35);
 }

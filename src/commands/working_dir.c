@@ -16,13 +16,15 @@ void cwd_cmd(client_t *client, char *root_path, char *arg, size_t len)
     char *path;
     DIR *dir;
 
-    if (!client_check_logged(client) || len == 0)
+    if (!client_check_logged(client) || is_arg_missing(client, len))
         return;
     path = make_path(client->cwd, arg, len);
-    if (!path)
+    if (check_alloc(client, path))
         return;
     dir = opendir(path);
     if (!dir || !is_valid_path(path, root_path)) {
+        client_send(client, INVALID_FILE, "Requested action not taken. File " \
+        "unavailable (e.g., file not found, no access).", 79);
         free(path);
         return;
     }

@@ -39,8 +39,10 @@ bool execute_cmd(client_t *client, char *root_path)
     char buf[client->cmd.size];
     size_t len;
 
-    if (!fct)
+    if (!fct) {
+        client_send(client, INVALID_CMD, "Command not implemented.", 24);
         return false;
+    }
     memset(buf, 0, client->cmd.size - 1);
     len = extract_arg(buf, client->cmd.str);
     fct(client, root_path, buf, len);

@@ -66,7 +66,7 @@ void client_clear_cmd(client_t *client)
 bool client_check_logged(client_t *client)
 {
     if (client->userid == -1) {
-        client_send(client, NOT_LOGGED, "Not logged.", 11);
+        client_send(client, NOT_LOGGED, "Not logged in.", 14);
         return false;
     }
     return true;
