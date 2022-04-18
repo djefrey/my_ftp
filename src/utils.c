@@ -16,7 +16,6 @@ bool ip_to_sockaddr(char *str, sockaddr_in_t *sockaddr)
     int digits = 0;
 
     for (; *str; str++) {
-        printf("%c - %i - %i\n", *str, commas, digits);
         if (*str == ',') {
             commas++;
             digits = 0;

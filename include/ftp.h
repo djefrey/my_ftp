@@ -72,6 +72,7 @@ bool client_send(client_t *client, int code, char *msg, size_t len);
 void client_accept_pasv(client_t *client);
 
 void client_send_file(client_t *client, char *path);
+void client_recv_file(client_t *client, char *path);
 void client_send_folder_content(client_t *client, char *path);
 void client_send_file_info(client_t *client, char *path);
 

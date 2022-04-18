@@ -36,6 +36,36 @@ void client_send_file(client_t *client, char *path)
             read(fd, &c, 1);
             write(client->conn.data, &c, 1);
         }
+        close(fd);
+        exit(0);
+    }
+}
+
+void client_recv_file(client_t *client, char *path)
+{
+    pid_t pid = fork();
+    fd_set rdset;
+    char c;
+    int fd;
+
+    if (pid == -1) {
+        client_send(client, LOCAL_ERROR,
+        "Requested action aborted. Local error in processing.", 52);
+    } else if (pid == 0) {
+        FD_ZERO(&rdset);
+        FD_SET(client->conn.data, &rdset);
+        fd = open(path, O_WRONLY | O_CREAT, 0, 644);
+        if (fd == -1) {
+            client_send(client, LOCAL_ERROR,
+            "Requested action aborted. Local error in processing.", 52);
+            exit(0);
+        }
+        while (select(client->conn.data + 1, &rdset, NULL, NULL,
+        &(struct timeval) {0, 10}) > 0) {
+            read(client->conn.data, &c, 1);
+            write(fd, &c, 1);
+        }
+        close(fd);
         exit(0);
     }
 }
