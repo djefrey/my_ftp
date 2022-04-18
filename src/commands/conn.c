@@ -66,13 +66,11 @@ void port_cmd(client_t *client, char *root_path, char *arg, size_t len)
     }
     fd = socket(AF_INET, SOCK_STREAM, 0);
     addr_in.sin_family = AF_INET;
-    printf("Connect ..\n");
     if (connect(fd, (sockaddr_t*) &addr_in, sizeof(sockaddr_in_t)) == -1) {
         client_send(client, INVALID_ARG, "Errr.", 5);
         close(fd);
         return;
     }
-    printf("Connected !");
     client->conn.mode = PORT;
     client->conn.data = fd;
     client_send(client, COMMAND_OK, "Command ok.", 11);
