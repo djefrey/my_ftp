@@ -11,7 +11,7 @@
 bool is_arg_missing(client_t *client, size_t len)
 {
     if (len == 0) {
-        client_send(client, INVALID_ARG,
+        client_send(client, 550,
         "Syntax error in parameters or arguments.", 40);
         return true;
     }
