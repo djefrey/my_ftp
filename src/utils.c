@@ -57,5 +57,5 @@ char *make_path(char *cwd, char *path, size_t len)
         memcpy(buf, path, len);
         buf[len] = 0;
     }
-    return realpath(buf, NULL);
+    return better_realpath(buf);
 }

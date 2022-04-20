@@ -27,7 +27,7 @@ client_t *client_create(int fd, sockaddr_in_t *addr, char *path, list_t *list)
     client->cmd.free = 0;
     client->cmd.str = NULL;
     client->cmd.ended = false;
-    memcpy(&client->addr, addr, sizeof(struct sockaddr_in));
+    memcpy(&client->addr, addr, sizeof(sockaddr_in_t));
     return client;
 }
 
@@ -61,13 +61,4 @@ void client_clear_cmd(client_t *client)
     client->cmd.size = 0;
     client->cmd.free = 0;
     client->cmd.ended = false;
-}
-
-bool client_check_logged(client_t *client)
-{
-    if (client->userid == -1) {
-        client_send(client, NOT_LOGGED, "Not logged in.", 14);
-        return false;
-    }
-    return true;
 }

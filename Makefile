@@ -8,10 +8,12 @@
 SRC				=	src/main.c						\
 					src/socket.c					\
 					src/list.c						\
+					src/path.c						\
 					src/utils.c						\
 					src/client/client.c				\
 					src/client/conn.c				\
 					src/client/file.c				\
+					src/client/utils.c				\
 					src/commands/commands.c			\
 					src/commands/user.c				\
 					src/commands/conn.c				\

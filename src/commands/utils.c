@@ -6,6 +6,8 @@
 */
 
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "ftp.h"
 
 bool is_arg_missing(client_t *client, size_t len)
@@ -35,6 +37,28 @@ bool is_path_illegal(client_t *client, char *path, char *root_path)
     if (strncmp(path, root_path, len)) {
         client_send(client, ILLEGAL_FILE,
         "Requested action not taken. File name not allowed.", 50);
+        return true;
+    }
+    return false;
+}
+
+bool is_file_not_valid(client_t *client, char *path, int flags, bool create)
+{
+    int fd;
+
+    if (create && access(path, F_OK) == -1) {
+        fd = open(path, O_CREAT, 0644);
+        if (fd == -1) {
+            client_send(client, INVALID_FILE,
+            "Requested action not taken. File unavailable.", 45);
+            return true;
+        }
+        close(fd);
+        return false;
+    }
+    if (access(path, flags) == -1) {
+        client_send(client, INVALID_FILE,
+        "Requested action not taken. File unavailable.", 45);
         return true;
     }
     return false;

@@ -23,8 +23,8 @@ void cwd_cmd(client_t *client, char *root_path, char *arg, size_t len)
         return;
     dir = opendir(path);
     if (!dir || is_path_illegal(client, path, root_path)) {
-        client_send(client, INVALID_FILE, "Requested action not taken. File " \
-        "unavailable (e.g., file not found, no access).", 79);
+        if (!dir)
+            client_send(client, INVALID_FILE, "Requested action not taken", 26);
         free(path);
         return;
     }

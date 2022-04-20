@@ -29,14 +29,14 @@ bool client_recv_cmd(client_t *client)
 
     FD_ZERO(&rdfds);
     FD_SET(client->conn.control, &rdfds);
-    while (select(client->conn.control + 1, &rdfds,
+    while (!client->quit && select(client->conn.control + 1, &rdfds,
     NULL, NULL, &(timeval_t) {0, 10}) > 0) {
-        read(client->conn.control, &c, 1);
+        if (read(client->conn.control, &c, 1) == 0)
+            client->quit = true;
         if (add_char_to_cmd(client, c))
             return true;
         if (client->cmd.size > 2
-        && client->cmd.str[client->cmd.size - 2] == '\r'
-        && client->cmd.str[client->cmd.size - 1] == '\n') {
+        && !strncmp(client->cmd.str + client->cmd.size - 2, CRLF, 2)) {
             if (add_char_to_cmd(client, '\0'))
                 return true;
             client->cmd.ended = true;

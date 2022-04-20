@@ -43,6 +43,7 @@ typedef struct connection_s {
     int control;
     int data;
     int listening_socket;
+    sockaddr_in_t port_addr;
     con_mode_t mode;
 } connection_t;
 
@@ -65,7 +66,6 @@ client_t *client_create(int fd, sockaddr_in_t *addr, char *path, list_t *list);
 void client_delete(client_t *client, list_t *list);
 void client_close_data(client_t *client);
 void client_clear_cmd(client_t *client);
-bool client_check_logged(client_t *client);
 
 bool client_recv_cmd(client_t *client);
 bool client_send(client_t *client, int code, char *msg, size_t len);
@@ -76,13 +76,19 @@ void client_recv_file(client_t *client, char *path);
 void client_send_folder_content(client_t *client, char *path);
 void client_send_file_info(client_t *client, char *path);
 
+bool client_check_logged(client_t *client);
+void client_set_port_addr(client_t *client, sockaddr_in_t *sockaddr);
+bool client_setup_pasv_con(client_t *client, sockaddr_in_t *addr_in);
+bool client_connect_to_data(client_t *client);
+
 bool execute_cmd(client_t *client, char *root_path);
 
 bool ip_to_sockaddr(char *str, sockaddr_in_t *sockaddr);
 void sockaddr_to_ip(sockaddr_in_t *sockaddr, char buf[24]);
 char *make_path(char *cwd, char *path, size_t len);
+char *better_realpath(char *ori_path);
 
 bool is_arg_missing(client_t *client, size_t len);
 bool check_alloc(client_t *client, void *ptr);
 bool is_path_illegal(client_t *client, char *path, char *root_path);
-
+bool is_file_not_valid(client_t *client, char *path, int flags, bool create);
