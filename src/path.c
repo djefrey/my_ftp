@@ -17,6 +17,7 @@ static void handle_special_dir(char *path, int *i, int prev_folder)
         memmove(path + *i, path + *i + 2, strlen(path + *i + 2) + 1);
         *i = 0;
     }
+    i = i;
     if (!strncmp(path + *i, "/../", 4)) {
         memmove(path + prev_folder, path + *i + 3, strlen(path + *i + 3) + 1);
         *i = 0;

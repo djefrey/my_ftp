@@ -54,9 +54,7 @@ bool is_file_not_valid(client_t *client, char *path, int flags, bool create)
             return true;
         }
         close(fd);
-        return false;
-    }
-    if (access(path, flags) == -1) {
+    } else if (access(path, flags) == -1) {
         client_send(client, INVALID_FILE,
         "Requested action not taken. File unavailable.", 45);
         return true;

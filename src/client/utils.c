@@ -52,6 +52,7 @@ bool client_setup_pasv_con(client_t *client, sockaddr_in_t *addr_in)
         client_send(client, DATA_NOT_OPEN, "Can't open data connection.", 27);
         return true;
     }
+    client = client;
     if (listen(fd, 1) == -1) {
         client_send(client, DATA_NOT_OPEN, "Can't open data connection.", 27);
         return true;

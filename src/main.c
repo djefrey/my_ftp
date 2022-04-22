@@ -56,14 +56,14 @@ list_t list, fd_set *rdset, fd_set *wrset)
 static bool client_update(client_t *client,
 char *path, fd_set *rdset, fd_set *wrset)
 {
-    int ctrl = client->conn.control;
+    int ctrl;
 
     if (client->conn.listening_socket != -1
     && FD_ISSET(client->conn.listening_socket, rdset))
         client_accept_pasv(client);
-    if (!(FD_ISSET(ctrl, rdset) && FD_ISSET(ctrl, wrset)))
-        return false;
-    if (client_recv_cmd(client)) {
+    ctrl = client->conn.control;
+    if ((FD_ISSET(ctrl, rdset) && FD_ISSET(ctrl, wrset))
+    && client_recv_cmd(client)) {
         execute_cmd(client, path);
         client_clear_cmd(client);
     }
@@ -79,7 +79,7 @@ static bool run(int socket, char *path, list_t *list)
     usleep(50000);
     if (wait_until_recv(socket, *list, &rdset, &wrset))
         return false;
-    if (FD_ISSET(socket, &rdset) && accept_new_clients(socket, path, list))
+    else if (FD_ISSET(socket, &rdset) && accept_new_clients(socket, path, list))
         return false;
     for (list_t cpy = *list; cpy; cpy = cpy->next) {
         client = GET(client_t, cpy);

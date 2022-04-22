@@ -33,7 +33,7 @@ void list_delete(list_t *root, void *data)
 
     if (!(*root))
         return;
-    if ((*root)->data == data) {
+    else if ((*root)->data == data) {
         prev = *root;
         *root = prev->next;
         free(prev);
