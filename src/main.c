@@ -64,7 +64,6 @@ char *path, fd_set *rdset, fd_set *wrset)
     if (!(FD_ISSET(ctrl, rdset) && FD_ISSET(ctrl, wrset)))
         return false;
     if (client_recv_cmd(client)) {
-        printf("Execute !\n");
         execute_cmd(client, path);
         client_clear_cmd(client);
     }
