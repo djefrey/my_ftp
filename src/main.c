@@ -35,7 +35,7 @@ list_t list, fd_set *rdset, fd_set *wrset)
     int biggest = socket;
 
     FD_ZERO(rdset);
-    FD_ZERO(rdset);
+    FD_ZERO(wrset);
     FD_SET(socket, rdset);
     for (; list; list = list->next) {
         client = GET(client_t, list);
