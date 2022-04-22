@@ -49,8 +49,6 @@ void stor_cmd(client_t *client, char *root_path, char *arg, size_t len)
         free(path);
         return;
     }
-    client_send(client, FILE_STATUS_OK,
-    "File status okay; about to open data connection.", 48);
     client_recv_file(client, path);
     client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
     client_close_data(client);

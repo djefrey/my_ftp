@@ -20,6 +20,9 @@
 
 #define CRLF "\r\n"
 #define ANONYMOUS_USERID 0
+#define LOCAL_ERROR_SEND(client) \
+    client_send(client, LOCAL_ERROR,  \
+    "Requested action aborted. Local error in processing.", 52);
 
 typedef unsigned int uint;
 typedef struct sockaddr sockaddr_t;
@@ -33,10 +36,8 @@ typedef enum con_mode_e {
 } con_mode_t;
 
 typedef struct cmd_s {
+    char cmd[1024];
     uint size;
-    uint free;
-    char *str;
-    bool ended;
 } cmd_t;
 
 typedef struct connection_s {
@@ -65,7 +66,6 @@ bool accept_new_clients(int socket, char *path, list_t *list);
 client_t *client_create(int fd, sockaddr_in_t *addr, char *path, list_t *list);
 void client_delete(client_t *client, list_t *list);
 void client_close_data(client_t *client);
-void client_clear_cmd(client_t *client);
 
 bool client_recv_cmd(client_t *client);
 bool client_send(client_t *client, int code, char *msg, size_t len);

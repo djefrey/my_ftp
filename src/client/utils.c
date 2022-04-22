@@ -61,21 +61,26 @@ bool client_setup_pasv_con(client_t *client, sockaddr_in_t *addr_in)
     return false;
 }
 
-bool client_connect_to_data(client_t *client)
+bool client_connect_to_data(client_t *cl)
 {
-    sockaddr_in_t *addr_in = &client->conn.port_addr;
+    sockaddr_in_t *addr_in = &cl->conn.port_addr;
     int fd;
 
-    client_send(client, FILE_STATUS_OK,
+    client_send(cl, FILE_STATUS_OK,
     "File status okay; about to open data connection.", 48);
-    if (client->conn.mode != PORT)
-        return false;
-    fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (connect(fd, (sockaddr_t*) addr_in, sizeof(sockaddr_in_t)) == -1) {
-        client_send(client, DATA_NOT_OPEN, "Can't open data connection.", 27);
-        close(fd);
+    if (cl->conn.mode == NONE
+    || (cl->conn.mode == PASV && cl->conn.data == -1)) {
+        client_send(cl, DATA_NOT_OPEN, "Can't open data connection.", 27);
         return true;
     }
-    client->conn.data = fd;
+    if (cl->conn.mode == PORT) {
+        fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (connect(fd, (sockaddr_t*) addr_in, sizeof(sockaddr_in_t)) == -1) {
+            client_send(cl, DATA_NOT_OPEN, "Can't open data connection.", 27);
+            close(fd);
+            return true;
+        }
+        cl->conn.data = fd;
+    }
     return false;
 }

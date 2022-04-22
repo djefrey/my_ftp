@@ -11,10 +11,10 @@
 
 static command_fct_t get_cmd_fct(client_t *client)
 {
-    if (client->cmd.size - 1 < 5)
-        return NULL;
     for (int i = 0 ; i < NB_COMMANDS; i++) {
-        if (!strncmp(CMD_NAME[i], client->cmd.str, CMD_LEN[i]))
+        if (client->cmd.size < CMD_LEN[i])
+            continue;
+        if (!strncmp(CMD_NAME[i], client->cmd.cmd, CMD_LEN[i]))
             return CMD_FCT[i];
     }
     return NULL;
@@ -44,7 +44,7 @@ bool execute_cmd(client_t *client, char *root_path)
         return false;
     }
     memset(buf, 0, client->cmd.size - 1);
-    len = extract_arg(buf, client->cmd.str);
+    len = extract_arg(buf, client->cmd.cmd);
     fct(client, root_path, buf, len);
     return true;
 }

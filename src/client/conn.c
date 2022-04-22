@@ -8,49 +8,44 @@
 #include <string.h>
 #include "ftp.h"
 
-static bool add_char_to_cmd(client_t *client, char c)
+static bool client_handle_cmd(client_t *client, char buf[1024], uint size)
 {
-    if (client->cmd.free == 0) {
-        client->cmd.str = realloc(client->cmd.str, client->cmd.size + 32);
-        if (!(client->cmd.str))
-            return true;
-        client->cmd.free = 32;
+    uint i = 2;
+
+    for (; i <= size; i++) {
+        if (!strncmp(buf + i - 2, CRLF, 2))
+            break;
     }
-    client->cmd.str[client->cmd.size] = c;
-    client->cmd.size += 1;
-    client->cmd.free -= 1;
+    if (i != (size + 1)) {
+        strncpy(client->cmd.cmd, buf, i);
+        client->cmd.cmd[i + 1] = 0;
+        client->cmd.size = i;
+        return true;
+    }
+    printf("Invalid transmittion\n");
+    client_send(client, INVALID_CMD, "Invalid transmission.", 21);
     return false;
 }
 
 bool client_recv_cmd(client_t *client)
 {
-    fd_set rdfds;
-    char c;
+    char buf[1024];
+    uint size = read(client->conn.control, buf, 1024);
 
-    FD_ZERO(&rdfds);
-    FD_SET(client->conn.control, &rdfds);
-    while (!client->quit && select(client->conn.control + 1, &rdfds,
-    NULL, NULL, &(timeval_t) {0, 10}) > 0) {
-        if (read(client->conn.control, &c, 1) == 0)
-            client->quit = true;
-        if (add_char_to_cmd(client, c))
-            return true;
-        if (client->cmd.size > 2
-        && !strncmp(client->cmd.str + client->cmd.size - 2, CRLF, 2)) {
-            if (add_char_to_cmd(client, '\0'))
-                return true;
-            client->cmd.ended = true;
-            break;
-        }
+    if (size == 0) {
+        client->quit = true;
+        return false;
+    } else if (size == 1024) {
+        client_send(client, INVALID_CMD, "Command too long.", 17);
+        return false;
     }
-    return false;
+    return client_handle_cmd(client, buf, size);
 }
 
 bool client_send(client_t *client, int code, char *msg, size_t len)
 {
     char buf[4 + len + 2 + 1];
     size_t size = 5;
-    fd_set wrfds;
 
     snprintf(buf, 4, "%03i", code);
     if (len > 0) {
@@ -59,11 +54,6 @@ bool client_send(client_t *client, int code, char *msg, size_t len)
         size += 1 + len;
     }
     memcpy(len ? buf + 4 + len : buf + 3, CRLF, 3);
-    FD_ZERO(&wrfds);
-    FD_SET(client->conn.control, &wrfds);
-    if (select(client->conn.control + 1, NULL,
-    &wrfds, NULL, &(timeval_t) {0, 10}) <= 0)
-        return true;
     write(client->conn.control, buf, size);
     return false;
 }
@@ -72,14 +62,8 @@ void client_accept_pasv(client_t *client)
 {
     socklen_t addr_size = sizeof(struct sockaddr);
     struct sockaddr_in addr_in;
-    fd_set rdset;
 
     if (client->conn.mode != PASV || client->conn.data != -1)
-        return;
-    FD_ZERO(&rdset);
-    FD_SET(client->conn.listening_socket, &rdset);
-    if (select(client->conn.listening_socket + 1, &rdset,
-    NULL, NULL, &(struct timeval) {0, 10}) <= 0)
         return;
     client->conn.data = accept(client->conn.listening_socket,
     (sockaddr_t*) &addr_in, &addr_size);

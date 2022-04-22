@@ -17,25 +17,20 @@
 void client_send_file(client_t *client, char *path)
 {
     pid_t pid = fork();
-    struct stat statbuf;
+    char buf[1024];
+    uint size;
     int fd;
-    char c;
 
     if (pid == -1) {
-        client_send(client, LOCAL_ERROR,
-        "Requested action aborted. Local error in processing.", 52);
+        LOCAL_ERROR_SEND(client);
     } else if (pid == 0) {
         fd = open(path, O_RDONLY);
         if (fd == -1) {
-            client_send(client, LOCAL_ERROR,
-            "Requested action aborted. Local error in processing.", 52);
+            LOCAL_ERROR_SEND(client);
             exit(0);
         }
-        fstat(fd, &statbuf);
-        for (size_t i = 0; i < statbuf.st_size; i++) {
-            read(fd, &c, 1);
-            write(client->conn.data, &c, 1);
-        }
+        while ((size = read(fd, buf, 1024)))
+            write(client->conn.data, buf, size);
         close(fd);
         exit(0);
     }
@@ -44,27 +39,20 @@ void client_send_file(client_t *client, char *path)
 void client_recv_file(client_t *client, char *path)
 {
     pid_t pid = fork();
-    fd_set rdset;
-    char c;
+    char buf[1024];
+    uint size;
     int fd;
 
     if (pid == -1) {
-        client_send(client, LOCAL_ERROR,
-        "Requested action aborted. Local error in processing.", 52);
+        LOCAL_ERROR_SEND(client);
     } else if (pid == 0) {
-        FD_ZERO(&rdset);
-        FD_SET(client->conn.data, &rdset);
         fd = open(path, O_WRONLY | O_CREAT, 0, 644);
         if (fd == -1) {
-            client_send(client, LOCAL_ERROR,
-            "Requested action aborted. Local error in processing.", 52);
+            LOCAL_ERROR_SEND(client);
             exit(0);
         }
-        while (select(client->conn.data + 1, &rdset, NULL, NULL,
-        &(struct timeval) {0, 10}) > 0) {
-            read(client->conn.data, &c, 1);
-            write(fd, &c, 1);
-        }
+        while ((size = read(client->conn.data, buf, 1024)))
+            write(fd, buf, size);
         close(fd);
         exit(0);
     }
@@ -77,13 +65,11 @@ void client_send_folder_content(client_t *client, char *path)
     struct dirent *content;
 
     if (pid == -1) {
-        client_send(client, LOCAL_ERROR,
-        "Requested action aborted. Local error in processing.", 52);
+        LOCAL_ERROR_SEND(client);
     } else if (pid == 0) {
         dir = opendir(path);
         if (!dir) {
-            client_send(client, INVALID_FILE,
-            "Requested action not taken. File unavailable.", 45);
+            LOCAL_ERROR_SEND(client);
             exit(0);
         }
         while ((content = readdir(dir))) {
@@ -102,8 +88,7 @@ void client_send_file_info(client_t *client, char *path)
     pid_t pid = fork();
 
     if (pid == -1) {
-        client_send(client, LOCAL_ERROR,
-        "Requested action aborted. Local error in processing.", 52);
+        LOCAL_ERROR_SEND(client);
     } else if (pid == 0) {
         write(client->conn.data, name, len);
         write(client->conn.data, CRLF, 2);

@@ -24,17 +24,12 @@ client_t *client_create(int fd, sockaddr_in_t *addr, char *path, list_t *list)
     client->quit = false;
     client->cwd = cwd;
     client->cmd.size = 0;
-    client->cmd.free = 0;
-    client->cmd.str = NULL;
-    client->cmd.ended = false;
     memcpy(&client->addr, addr, sizeof(sockaddr_in_t));
     return client;
 }
 
 void client_delete(client_t *client, list_t *list)
 {
-    if (client->cmd.str)
-        free(client->cmd.str);
     client_close_data(client);
     close(client->conn.control);
     list_delete(list, client);
@@ -50,15 +45,4 @@ void client_close_data(client_t *client)
     client->conn.data = -1;
     client->conn.listening_socket = -1;
     client->conn.mode = NONE;
-}
-
-void client_clear_cmd(client_t *client)
-{
-    if (client->cmd.str) {
-        free(client->cmd.str);
-        client->cmd.str = NULL;
-    }
-    client->cmd.size = 0;
-    client->cmd.free = 0;
-    client->cmd.ended = false;
 }
