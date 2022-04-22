@@ -8,21 +8,22 @@
 #include <string.h>
 #include "ftp.h"
 
-static bool client_handle_cmd(client_t *client, char buf[1024], uint size)
+static bool client_get_cmd_from_buffer(client_t *client, char buf[1024], uint size)
 {
-    uint i = 2;
+    uint i = 0;
 
-    for (; i <= size; i++) {
-        if (!strncmp(buf + i - 2, CRLF, 2))
-            break;
+    for (; i < size; i++, client->cmd.size++) {
+        if (client->cmd.size == 1024) {
+            memset(client->cmd.cmd, 0, 1024);
+            client->cmd.size = 0;
+            client_send(client, INVALID_CMD, "Command too long.", 17);
+            return false;
+        }
+        client->cmd.cmd[client->cmd.size] = buf[i];
+        if (client->cmd.size > 1
+        && !strncmp(client->cmd.cmd + client->cmd.size - 1, CRLF, 2))
+            return true;
     }
-    if (i != (size + 1)) {
-        strncpy(client->cmd.cmd, buf, i);
-        client->cmd.cmd[i + 1] = 0;
-        client->cmd.size = i;
-        return true;
-    }
-    client_send(client, INVALID_CMD, "Invalid transmission.", 21);
     return false;
 }
 
@@ -38,7 +39,7 @@ bool client_recv_cmd(client_t *client)
         client_send(client, INVALID_CMD, "Command too long.", 17);
         return false;
     }
-    return client_handle_cmd(client, buf, size);
+    return client_get_cmd_from_buffer(client, buf, size);
 }
 
 bool client_send(client_t *client, int code, char *msg, size_t len)

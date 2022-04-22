@@ -32,6 +32,7 @@ void client_send_file(client_t *client, char *path)
         while ((size = read(fd, buf, 1024)))
             write(client->conn.data, buf, size);
         close(fd);
+        client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
         exit(0);
     }
 }
@@ -54,6 +55,7 @@ void client_recv_file(client_t *client, char *path)
         while ((size = read(client->conn.data, buf, 1024)))
             write(fd, buf, size);
         close(fd);
+        client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
         exit(0);
     }
 }
@@ -77,6 +79,7 @@ void client_send_folder_content(client_t *client, char *path)
             write(client->conn.data, CRLF, 2);
         }
         closedir(dir);
+        client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
         exit(0);
     }
 }
@@ -92,6 +95,7 @@ void client_send_file_info(client_t *client, char *path)
     } else if (pid == 0) {
         write(client->conn.data, name, len);
         write(client->conn.data, CRLF, 2);
+        client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
         exit(0);
     }
 }

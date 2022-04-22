@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include "ftp.h"
 
 static void disconnect_leaving_clients(list_t *list)
@@ -62,8 +63,11 @@ char *path, fd_set *rdset, fd_set *wrset)
         client_accept_pasv(client);
     if (!(FD_ISSET(ctrl, rdset) && FD_ISSET(ctrl, wrset)))
         return false;
-    if (client_recv_cmd(client))
+    if (client_recv_cmd(client)) {
+        printf("Execute !\n");
         execute_cmd(client, path);
+        client_clear_cmd(client);
+    }
     return false;
 }
 
@@ -73,6 +77,7 @@ static bool run(int socket, char *path, list_t *list)
     fd_set rdset;
     fd_set wrset;
 
+    usleep(50000);
     if (wait_until_recv(socket, *list, &rdset, &wrset))
         return false;
     if (FD_ISSET(socket, &rdset) && accept_new_clients(socket, path, list))

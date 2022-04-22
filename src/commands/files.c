@@ -29,7 +29,6 @@ void retr_cmd(client_t *client, char *root_path, char *arg, size_t len)
         return;
     }
     client_send_file(client, path);
-    client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
     client_close_data(client);
     free(path);
 }
@@ -50,7 +49,6 @@ void stor_cmd(client_t *client, char *root_path, char *arg, size_t len)
         return;
     }
     client_recv_file(client, path);
-    client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
     client_close_data(client);
     free(path);
 }
@@ -86,7 +84,6 @@ void list_cmd(client_t *client, char *root_path, char *arg, size_t len)
         return;
     }
     send_list(client, path);
-    client_send(client, CLOSING_DATA_CON, "Closing data connection.", 24);
     client_close_data(client);
     free(path);
 }

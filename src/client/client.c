@@ -46,3 +46,9 @@ void client_close_data(client_t *client)
     client->conn.listening_socket = -1;
     client->conn.mode = NONE;
 }
+
+void client_clear_cmd(client_t *client)
+{
+    memset(client->cmd.cmd, 0, 1024);
+    client->cmd.size = 0;
+}
