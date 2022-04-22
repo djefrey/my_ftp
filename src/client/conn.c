@@ -22,7 +22,6 @@ static bool client_handle_cmd(client_t *client, char buf[1024], uint size)
         client->cmd.size = i;
         return true;
     }
-    printf("Invalid transmittion\n");
     client_send(client, INVALID_CMD, "Invalid transmission.", 21);
     return false;
 }
