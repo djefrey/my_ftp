@@ -27,9 +27,7 @@
 #define DATA_NOT_OPEN 425
 #define INVALID_LOGIN 430
 
-
 #define LOCAL_ERROR 550
-
 
 #define INVALID_CMD 500
 #define INVALID_ARG 501
